@@ -1,4 +1,5 @@
 import "../App.css";
+import api from "../services/api";
 import { useEffect, useState } from "react";
 import IthranLogo from "../assets/logo/IthranLogo.png";
 import Breadcrumbs from "../components/BreadcrumbNav.tsx";
@@ -29,21 +30,14 @@ function WorkPage() {
   const fetchExperiences = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:8000/api/work-experience/",
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch work experiences");
-      }
+      const response = await api.get<ApiExperience[]>("/work-experience/");
 
-      const data: ApiExperience[] = await response.json();
-
-      const transformedExperiences: ExperienceItem[] = data.map((exp) => ({
+      const transformedExperiences: ExperienceItem[] = response.data.map((exp) => ({
         id: String(exp.id),
         logo: exp.logo,
         title: exp.title,
-        subtitle: exp.subtitle || "",
+        subtitle: exp.subtitle ?? "",
         images: exp.images.map((img) => img.image),
         orgName: exp.company_name,
         address: exp.company_address,
@@ -55,7 +49,7 @@ function WorkPage() {
     } catch (err) {
       console.error("Error fetching experiences:", err);
       setError(
-        "Failed to load work experiences. Make sure the backend server is running.",
+        "Failed to load work experiences. Make sure the backend server is running."
       );
     } finally {
       setLoading(false);
