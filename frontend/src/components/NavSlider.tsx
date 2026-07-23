@@ -140,11 +140,11 @@ export default function NavSlider() {
     <div className="fixed bottom-4 left-4 z-30 sm:bottom-6 sm:left-6">
 
       <motion.p
-        className="text-xs text-gray-500/70 text-left mb-0 select-none"
+        className="text-xs text-gray-500/70 text-center mb-0 select-none"
         animate={{ opacity: hintVisible ? 1 : 0 }}
         transition={{ duration: 0.4 }}
       >
-        drag/click to navigate
+        Drag/click to navigate
       </motion.p>
 
       <div
