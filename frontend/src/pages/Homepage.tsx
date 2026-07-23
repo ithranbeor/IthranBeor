@@ -1,6 +1,6 @@
 import '../App.css'
 import { Link } from 'react-router-dom';
-import Ithran from '../assets/images/Ithran.png'
+import Ithran from '../assets/images/ithran.png'
 import IthranLogo from '../assets/logo/IthranLogo.png'
 import { motion } from 'framer-motion';
 import Breadcrumbs from '../components/BreadcrumbNav.tsx';
