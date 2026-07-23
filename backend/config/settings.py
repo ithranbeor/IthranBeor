@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "portfolio",
+    "storages"
 ]
 
 MIDDLEWARE = [
@@ -40,6 +41,26 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AWS_ACCESS_KEY_ID = os.getenv("SUPABASE_S3_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = os.getenv("SUPABASE_S3_SECRET_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("SUPABASE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = os.getenv("SUPABASE_S3_ENDPOINT")
+AWS_S3_REGION_NAME = os.getenv("SUPABASE_S3_REGION", "us-east-1")
+AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_CUSTOM_DOMAIN = f"{os.getenv('SUPABASE_PROJECT_REF')}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
