@@ -1,0 +1,17 @@
+<!-- <div className="absolute inset-0 -z-10">
+
+    <div className="absolute top-20 left-20 w-80 h-80 rounded-full bg-white/40 blur-[120px]" />
+
+    <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-gray-300/40 blur-[140px]" />
+
+    <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/20 blur-[180px]" />
+
+</div>
+
+bg-white/20
+backdrop-blur-3xl
+backdrop-saturate-150
+border border-white/30
+shadow-[0_8px_40px_rgba(0,0,0,0.12)]
+hover:bg-white/30
+rounded-[28px] -->
