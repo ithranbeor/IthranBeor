@@ -1,4 +1,5 @@
 import "../App.css";
+import api from "../services/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -212,12 +213,8 @@ function WorkExperienceManager() {
   const fetchExperiences = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:8000/api/work-experience/",
-      );
-      if (!response.ok) throw new Error("Failed to fetch");
-      const data = await response.json();
-      setExperiences(data);
+      const response = await api.get<WorkExperience[]>("/work-experience/");
+      setExperiences(response.data);
       setError("");
     } catch (err) {
       setError("Failed to load work experiences");
@@ -273,31 +270,20 @@ function WorkExperienceManager() {
 
       let response;
       if (editingId) {
-        response = await fetch(
-          `http://localhost:8000/api/work-experience/${editingId}/`,
-          { method: "PATCH", body: data },
-        );
+        response = await api.patch(`/work-experience/${editingId}/`, data);
       } else {
-        response = await fetch(
-          "http://localhost:8000/api/work-experience/",
-          {
-            method: "POST",
-            body: data,
-          },
-        );
+        response = await api.post("/work-experience/", data);
       }
 
-      if (!response.ok) throw new Error("Failed to save");
-
-      const savedExperience = await response.json();
+      const savedExperience = response.data;
 
       if (newImages.length > 0) {
         for (const image of newImages) {
           const imageData = new FormData();
           imageData.append("image", image);
-          await fetch(
-            `http://localhost:8000/api/work-experience/${savedExperience.id}/images/`,
-            { method: "POST", body: imageData },
+          await api.post(
+            `/work-experience/${savedExperience.id}/images/`,
+            imageData,
           );
         }
       }
@@ -333,11 +319,7 @@ function WorkExperienceManager() {
     if (!confirm("Delete this image?")) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/work-experience/${editingId}/images/${imageId}/`,
-        { method: "DELETE" },
-      );
-      if (!response.ok) throw new Error("Failed to delete image");
+      await api.delete(`/work-experience/${editingId}/images/${imageId}/`);
       setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
     } catch (err) {
       setError("Failed to delete image");
@@ -351,11 +333,7 @@ function WorkExperienceManager() {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/work-experience/${id}/`,
-        { method: "DELETE" },
-      );
-      if (!response.ok) throw new Error("Failed to delete");
+      await api.delete(`/work-experience/${id}/`);
       await fetchExperiences();
       setError("");
     } catch (err) {
