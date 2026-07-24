@@ -7,6 +7,7 @@ import ExamSyncPic1 from '../assets/images/examsync/Pic1.png'
 import ExamSyncPic2 from '../assets/images/examsync/Pic2.png'
 import ExamSyncPic3 from '../assets/images/examsync/Pic3.png'
 import ExamSyncPic4 from '../assets/images/examsync/Pic4.png'
+import ExamSyncVid1 from '../assets/images/examsync/ExamSyncVid1.mp4'
 
 export type ProjectCategory = 'solo' | 'group' | 'collaboration';
 
@@ -60,6 +61,7 @@ export const projects: Project[] = [
       { id: 'examsync-2', label: 'Pic 2', src: ExamSyncPic2 },
       { id: 'examsync-3', label: 'Pic 3', src: ExamSyncPic3 },
       { id: 'examsync-4', label: 'Pic 4', src: ExamSyncPic4 },
+      { id: 'examsync-5', label: 'Vid 1', src: ExamSyncVid1 },
     ],
   },
 ];

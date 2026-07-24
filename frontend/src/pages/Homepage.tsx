@@ -2,16 +2,11 @@ import '../App.css'
 import { Link } from 'react-router-dom';
 import Ithran from '../assets/images/ithran.png'
 import IthranLogo from '../assets/logo/IthranLogo.png'
+import Canvaicon from '../assets/logo/Canvaicon.png'
 import { motion } from 'framer-motion';
 import Breadcrumbs from '../components/BreadcrumbNav.tsx';
 import FloatingNavigation from "../components/FloatingNavigation";
 import { projects } from '../data/projects.ts';
-import {
-  LuMonitorSmartphone,
-  LuSettings2,
-  LuDatabase,
-  LuPalette,
-} from 'react-icons/lu';
 
 // const Highlight = ({ children }: { children: React.ReactNode }) => (
 //   <span className="inline px-1 py-1 mx-0.5 rounded-md bg-white/70 text-gray-900 font-medium shadow-sm">
@@ -35,37 +30,33 @@ function HomePage() {
   const techCategories = [
     {
       title: 'Frontend & Mobile Development',
-      icon: LuMonitorSmartphone,
       items: [
-        { name: 'React JS', badge: 'RJS', caption: 'Web Development' },
-        { name: 'React Native', badge: 'RN', caption: 'Mobile Development' },
-        { name: 'HTML5 & CSS3', badge: 'HC', caption: 'Responsive Web Design' },
-        { name: 'JavaScript', badge: 'JS', caption: 'ES6+' },
+        { name: 'React JS', icon: 'https://cdn.simpleicons.org/react/61DAFB', caption: 'Web Development' },
+        { name: 'React Native', icon: 'https://cdn.simpleicons.org/react/61DAFB', caption: 'Mobile Development' },
+        { name: 'HTML5 & CSS3', icon: 'https://cdn.simpleicons.org/html5/E34F26', caption: 'Responsive Web Design' },
+        { name: 'JavaScript', icon: 'https://cdn.simpleicons.org/javascript/F7DF1E', caption: 'ES6+' },
       ],
     },
     {
       title: 'Systems & Tools',
-      icon: LuSettings2,
       items: [
-        { name: 'Git', badge: 'GIT', caption: 'Version control' },
-        { name: 'Agile Methodology', badge: 'AM', caption: 'Task execution' },
+        { name: 'Git', icon: 'https://cdn.simpleicons.org/git/F05032', caption: 'Version control' },
+        { name: 'Agile Methodology', icon: 'https://cdn.simpleicons.org/jirasoftware/0052CC', caption: 'Task execution' },
       ],
     },
     {
       title: 'User Interface/UX & Digital Design',
-      icon: LuPalette,
       items: [
-        { name: 'Figma', badge: 'FIG', caption: 'Interactive Prototyping' },
-        { name: 'Canva', badge: 'CV', caption: 'Digital asset design' },
+        { name: 'Figma', icon: 'https://cdn.simpleicons.org/figma/F24E1E', caption: 'Interactive Prototyping' },
+        { name: 'Canva', icon: Canvaicon, caption: 'Digital asset design' },
       ],
     },
     {
       title: 'Backend & Database Engineering',
-      icon: LuDatabase,
       items: [
-        { name: 'Django', badge: 'DJ', caption: 'Framework' },
-        { name: 'Supabase', badge: 'SB', caption: 'BaaS' },
-        { name: 'RESTful APIs', badge: 'API', caption: 'Integration' },
+        { name: 'Django', icon: 'https://cdn.simpleicons.org/django/092E20', caption: 'Framework' },
+        { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/3FCF8E', caption: 'BaaS' },
+        { name: 'RESTful APIs', icon: 'https://cdn.simpleicons.org/fastapi/009688', caption: 'Integration' },
       ],
     },
   ];
@@ -271,12 +262,12 @@ function HomePage() {
               >
                 <Link
                   to={`/projects?project=${project.id}`}
-                  className="flex items-center justify-center h-48 bg-white/70 backdrop-blur-2xl text-gray-500 group relative overflow-hidden rounded-[28px] p-6
+                  className="group flex items-center justify-center h-48 bg-white/70 backdrop-blur-2xl text-gray-500 relative overflow-hidden rounded-[28px] p-6
                   backdrop-saturate-150 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.10)] transition-all
                   duration-300 hover:bg-white/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)]
                   "
-              >
-                {/* Glass highlight */}
+                >
+                  {/* Glass highlight */}
                   <div
                     className="
                       absolute inset-0 bg-linear-to-br from-white/40 via-white/10 to-transparent pointer-events-none
@@ -290,17 +281,17 @@ function HomePage() {
                     "
                   />
 
-                  {/* Cover image */}
+                  {/* Cover image — front and center by default, dims on hover so name/logo can take over */}
                   {project.proofs[0] && (
                     <img
                       src={project.proofs[0].src}
                       alt={project.name}
-                      className="absolute inset-0 h-full w-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-300"
+                      className="absolute inset-0 h-full w-full object-cover opacity-70 group-hover:opacity-30 transition-opacity duration-300"
                     />
                   )}
 
-                  {/* Content */}
-                  <div className="relative z-10 flex flex-col items-center gap-2">
+                  {/* Name + logo — hidden until hover */}
+                  <div className="relative z-10 flex flex-col items-center gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <img
                       src={project.logo}
                       alt={project.name}
@@ -310,6 +301,17 @@ function HomePage() {
                       {project.name}
                     </p>
                   </div>
+
+                  {/* Vanishing hint — appears briefly on load, fades away on its own; hidden entirely during hover since the name is already showing */}
+                  <span
+                    className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 group-hover:opacity-0 group-hover:animate-none"
+                  >
+                    <span
+                      className="vanish-hint block rounded-full bg-black/60 px-3 py-1 text-[11px] font-medium text-white backdrop-blur-sm"
+                    >
+                      Click to explore
+                    </span>
+                  </span>
                 </Link>
               </motion.li>
 
@@ -363,7 +365,6 @@ function HomePage() {
             {/* Technologies — glassmorphism list, mobile-first */}
             <div className="space-y-6 mb-16">
               {techCategories.map((category, index) => {
-                const Icon = category.icon;
 
                 return (
                   <motion.div
@@ -391,16 +392,6 @@ function HomePage() {
                     <div className="relative z-10">
                       {/* Header row */}
                       <div className="flex items-center gap-4 mb-5">
-                        <div
-                          className="
-                            flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl
-                            bg-black/80 text-white shadow-lg backdrop-blur-sm
-                            transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3
-                          "
-                        >
-                          <Icon size={26} />
-                        </div>
-
                         <div className="min-w-0">
                           <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
                             {category.title}
@@ -426,10 +417,15 @@ function HomePage() {
                             <span
                               className="
                                 flex h-8 w-8 shrink-0 items-center justify-center rounded-full
-                                bg-gray-900 text-white text-[10px] font-bold
+                                bg-white shadow-inner p-1.5
                               "
                             >
-                              {item.badge}
+                              <img
+                                src={item.icon}
+                                alt={item.name}
+                                className="h-full w-full object-contain"
+                                loading="lazy"
+                              />
                             </span>
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-gray-900 truncate">
@@ -578,7 +574,7 @@ function HomePage() {
 
         {/* CTA */}
         <section id="resume" className="bg-[#EBEBEB] px-6 md:px-12 lg:px-20 py-24 font-poppins relative z-10">
-          <div className="bg-gray-900 rounded-4xl p-10 md:p-16 text-center shadow-2xl">
+          <div className="bg-gray-600 rounded-4xl p-10 md:p-16 text-center shadow-2xl">
             <p className="uppercase tracking-[0.3em] text-gray-400 text-sm mb-5">
               Let's Build Something
             </p>
@@ -602,7 +598,7 @@ function HomePage() {
               <a
                 href="/resume/Ithran-Beor-Resume.pdf"
                 download
-                className="px-6 py-3 rounded-xl border border-gray-500 text-white hover:bg-white/10 transition-all duration-300"
+                className="px-6 py-3 rounded-xl border border-gray-100 text-white hover:bg-white/10 transition-all duration-300"
               >
                 Download Resume
               </a>

@@ -1,5 +1,5 @@
 // frontend/src/components/ExperienceAccordion.tsx
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import {
@@ -7,17 +7,32 @@ import {
   LuChevronRight,
   LuChevronLeft,
   LuX,
+  LuPlay,
 } from 'react-icons/lu';
+
+export interface ExperienceDetail {
+  label: string;
+  description: string;
+}
 
 export interface ExperienceItem {
   id: string;
   logo: string;
   title: string;
   subtitle: string;
-  images: string[];
+  images: string[]; // photos AND videos — type is auto-detected by file extension
   orgName: string;
   address: string;
   pills: string[];
+  details?: ExperienceDetail[];
+  supervisionNote?: string;
+}
+
+const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg', '.mov', '.m4v'];
+
+function isVideo(src: string): boolean {
+  const clean = src.split('?')[0].toLowerCase();
+  return VIDEO_EXTENSIONS.some((ext) => clean.endsWith(ext));
 }
 
 const cardSpring = {
@@ -34,6 +49,26 @@ const spring = {
   mass: 0.9,
 };
 
+/** Small autoplay-paused video thumbnail with a play badge, used inside grids/carousels. */
+function VideoThumb({ src, className }: { src: string; className?: string }) {
+  return (
+    <div className={`relative ${className ?? ''}`}>
+      <video
+        src={src}
+        preload="metadata"
+        muted
+        playsInline
+        className="h-full w-full object-cover"
+      />
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md">
+          <LuPlay size={18} className="ml-0.5" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Lightbox({
   images,
   index,
@@ -45,6 +80,9 @@ function Lightbox({
   onClose: () => void;
   onNavigate: (dir: 1 | -1) => void;
 }) {
+  const current = images[index];
+  const currentIsVideo = isVideo(current);
+
   return createPortal(
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
@@ -61,11 +99,22 @@ function Lightbox({
         transition={spring}
         onClick={(e) => e.stopPropagation()}
       >
-        <img
-          src={images[index]}
-          alt=""
-          className="max-h-[90vh] w-full object-contain"
-        />
+        {currentIsVideo ? (
+          <video
+            key={current}
+            src={current}
+            controls
+            autoPlay
+            playsInline
+            className="max-h-[90vh] w-full object-contain"
+          />
+        ) : (
+          <img
+            src={current}
+            alt=""
+            className="max-h-[90vh] w-full object-contain"
+          />
+        )}
 
         <button
           onClick={onClose}
@@ -97,9 +146,67 @@ function Lightbox({
   );
 }
 
+function DetailsModal({
+  item,
+  onClose,
+}: {
+  item: ExperienceItem;
+  onClose: () => void;
+}) {
+  return createPortal(
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm md:p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="apple-scroll relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/40 bg-white/95 p-6 backdrop-blur-md md:p-8"
+        initial={{ scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.92, opacity: 0 }}
+        transition={spring}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/10 text-gray-700 transition hover:bg-black/20"
+        >
+          <LuX size={18} />
+        </button>
+
+        <div className="pr-10">
+          <h3 className="text-lg font-bold text-gray-800">{item.title}</h3>
+          <p className="mt-1 text-sm text-gray-500">{item.subtitle}</p>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-4">
+          {item.details?.map((d, i) => (
+            <div key={i}>
+              <h4 className="text-sm font-bold text-indigo-900">{d.label}</h4>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                {d.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {item.supervisionNote && (
+          <p className="mt-6 border-t border-gray-200 pt-4 text-xs italic leading-relaxed text-gray-500">
+            {item.supervisionNote}
+          </p>
+        )}
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+}
+
 function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
   const [index, setIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   if (images.length === 0) return null;
 
@@ -118,7 +225,14 @@ function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
     else if (info.offset.x > 60) prev();
   };
 
-  // 1–2 images
+  // Pause the active carousel video whenever the slide changes away from it
+  useEffect(() => {
+    videoRef.current?.pause();
+  }, [index]);
+
+  const activeIsVideo = isVideo(images[index]);
+
+  // 1–2 items
   if (images.length <= 2) {
     return (
       <>
@@ -134,11 +248,15 @@ function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
               onClick={() => setLightboxIndex(i)}
               className="overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm"
             >
-              <img
-                src={src}
-                alt={`${alt} ${i + 1}`}
-                className="h-48 w-full object-cover transition hover:scale-105 md:h-56"
-              />
+              {isVideo(src) ? (
+                <VideoThumb src={src} className="h-48 w-full transition hover:scale-105 md:h-56" />
+              ) : (
+                <img
+                  src={src}
+                  alt={`${alt} ${i + 1}`}
+                  className="h-48 w-full object-cover transition hover:scale-105 md:h-56"
+                />
+              )}
             </button>
           ))}
         </div>
@@ -157,26 +275,45 @@ function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
     );
   }
 
-  // 3+ images
+  // 3+ items
   return (
     <>
       <div className="relative h-56 overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm md:h-64">
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.img
-            key={index}
-            src={images[index]}
-            alt={`${alt} ${index + 1}`}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.6}
-            onDragEnd={handleDragEnd}
-            onClick={() => setLightboxIndex(index)}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={cardSpring}
-            className="absolute inset-0 h-full w-full cursor-pointer object-cover active:cursor-grabbing"
-          />
+          {activeIsVideo ? (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={cardSpring}
+              className="absolute inset-0"
+            >
+              <video
+                ref={videoRef}
+                src={images[index]}
+                controls
+                playsInline
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
+          ) : (
+            <motion.img
+              key={index}
+              src={images[index]}
+              alt={`${alt} ${index + 1}`}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.6}
+              onDragEnd={handleDragEnd}
+              onClick={() => setLightboxIndex(index)}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={cardSpring}
+              className="absolute inset-0 h-full w-full cursor-pointer object-cover active:cursor-grabbing"
+            />
+          )}
         </AnimatePresence>
 
         <button
@@ -222,6 +359,9 @@ function ExperienceCard({
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const [showDetails, setShowDetails] = useState(false);
+  const hasDetails = !!item.details && item.details.length > 0;
+
   return (
     <motion.div
       layout
@@ -280,8 +420,26 @@ function ExperienceCard({
                   </span>
                 ))}
               </div>
+
+              {hasDetails && (
+                <div className="mt-5 flex justify-start">
+                  <button
+                    type="button"
+                    onClick={() => setShowDetails(true)}
+                    className="flex items-center gap-2 rounded-full border border-white/50 bg-white/40 px-4 py-2 text-xs font-semibold text-indigo-900 backdrop-blur-sm shadow-sm transition hover:bg-white/60"
+                  >
+                    View Detailed Experience
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showDetails && hasDetails && (
+          <DetailsModal item={item} onClose={() => setShowDetails(false)} />
         )}
       </AnimatePresence>
     </motion.div>
