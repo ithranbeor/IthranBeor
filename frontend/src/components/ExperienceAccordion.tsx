@@ -1,7 +1,13 @@
 // frontend/src/components/ExperienceAccordion.tsx
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { LuChevronDown, LuChevronRight } from 'react-icons/lu';
+import {
+  LuChevronDown,
+  LuChevronRight,
+  LuChevronLeft,
+  LuX,
+} from 'react-icons/lu';
 
 export interface ExperienceItem {
   id: string;
@@ -21,79 +27,189 @@ const cardSpring = {
   mass: 0.9,
 };
 
+const spring = {
+  type: 'spring' as const,
+  stiffness: 220,
+  damping: 28,
+  mass: 0.9,
+};
+
+function Lightbox({
+  images,
+  index,
+  onClose,
+  onNavigate,
+}: {
+  images: string[];
+  index: number;
+  onClose: () => void;
+  onNavigate: (dir: 1 | -1) => void;
+}) {
+  return createPortal(
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="relative max-h-[90vh] max-w-5xl overflow-hidden rounded-3xl"
+        initial={{ scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.92, opacity: 0 }}
+        transition={spring}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={images[index]}
+          alt=""
+          className="max-h-[90vh] w-full object-contain"
+        />
+
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md"
+        >
+          <LuX size={20} />
+        </button>
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={() => onNavigate(-1)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-md"
+            >
+              <LuChevronLeft size={22} />
+            </button>
+
+            <button
+              onClick={() => onNavigate(1)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-md"
+            >
+              <LuChevronRight size={22} />
+            </button>
+          </>
+        )}
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+}
+
 function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
   const [index, setIndex] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   if (images.length === 0) return null;
 
-  // 1–2 images: static side-by-side grid, matches the reference design exactly.
-  if (images.length <= 2) {
-    return (
-      <div className={`grid gap-3 ${images.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-        {images.map((src, i) => (
-          <div
-            key={i}
-            className="overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm"
-          >
-            <img
-              src={src}
-              alt={`${alt} photo ${i + 1}`}
-              className="h-48 w-full object-cover md:h-56"
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // 3+ images: draggable carousel with a next button + dot indicators.
   const next = () => setIndex((i) => (i + 1) % images.length);
   const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+
+  const navigateLightbox = (dir: 1 | -1) => {
+    setLightboxIndex((i) => {
+      if (i === null) return i;
+      return (i + dir + images.length) % images.length;
+    });
+  };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.x < -60) next();
     else if (info.offset.x > 60) prev();
   };
 
+  // 1–2 images
+  if (images.length <= 2) {
+    return (
+      <>
+        <div
+          className={`grid gap-3 ${
+            images.length === 2 ? "grid-cols-2" : "grid-cols-1"
+          }`}
+        >
+          {images.map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setLightboxIndex(i)}
+              className="overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm"
+            >
+              <img
+                src={src}
+                alt={`${alt} ${i + 1}`}
+                className="h-48 w-full object-cover transition hover:scale-105 md:h-56"
+              />
+            </button>
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {lightboxIndex !== null && (
+            <Lightbox
+              images={images}
+              index={lightboxIndex}
+              onClose={() => setLightboxIndex(null)}
+              onNavigate={navigateLightbox}
+            />
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
+
+  // 3+ images
   return (
-    <div className="relative h-56 overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm md:h-64">
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.img
-          key={index}
-          src={images[index]}
-          alt={`${alt} photo ${index + 1}`}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.6}
-          onDragEnd={handleDragEnd}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={cardSpring}
-          className="absolute inset-0 h-full w-full cursor-grab object-cover active:cursor-grabbing"
-        />
-      </AnimatePresence>
-
-      <button
-        type="button"
-        onClick={next}
-        aria-label="Next image"
-        className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/40 text-gray-700 backdrop-blur-md shadow-sm transition hover:bg-white/60"
-      >
-        <LuChevronRight size={18} />
-      </button>
-
-      <div className="absolute bottom-3 left-3 flex gap-1.5">
-        {images.map((_, i) => (
-          <span
-            key={i}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/50'
-            }`}
+    <>
+      <div className="relative h-56 overflow-hidden rounded-2xl border border-white/40 bg-white/10 backdrop-blur-sm md:h-64">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.img
+            key={index}
+            src={images[index]}
+            alt={`${alt} ${index + 1}`}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.6}
+            onDragEnd={handleDragEnd}
+            onClick={() => setLightboxIndex(index)}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={cardSpring}
+            className="absolute inset-0 h-full w-full cursor-pointer object-cover active:cursor-grabbing"
           />
-        ))}
+        </AnimatePresence>
+
+        <button
+          type="button"
+          onClick={next}
+          className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/40 backdrop-blur-md"
+        >
+          <LuChevronRight size={18} />
+        </button>
+
+        <div className="absolute bottom-3 left-3 flex gap-1.5">
+          {images.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-4 bg-white" : "w-1.5 bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+
+      <AnimatePresence>
+        {lightboxIndex !== null && (
+          <Lightbox
+            images={images}
+            index={lightboxIndex}
+            onClose={() => setLightboxIndex(null)}
+            onNavigate={navigateLightbox}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
