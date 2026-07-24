@@ -57,7 +57,7 @@ function AdminLogin() {
               <img
                 src={IthranLogo}
                 alt="Ithran Beor"
-                className="h-9 w-9 object-cover"
+                className="h-6 w-6 object-cover"
               />
             </div>
           </div>

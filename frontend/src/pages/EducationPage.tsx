@@ -143,7 +143,7 @@ function EducationPage() {
                 <img
                   src={IthranLogo}
                   alt="Ithran Beor"
-                  className="h-10 w-10 object-cover"
+                  className="h-6 w-6 object-cover"
                 />
 
                 <h1 className="truncate text-xl font-semibold text-slate-800">

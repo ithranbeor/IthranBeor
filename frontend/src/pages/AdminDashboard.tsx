@@ -706,7 +706,7 @@ function AdminDashboard() {
             <img
               src={IthranLogo}
               alt="Ithran Beor"
-              className="h-10 w-10 object-cover"
+              className="h-6 w-6 object-cover"
             />
             <div className="min-w-0">
               <h1 className="text-lg font-medium text-gray-800 truncate">
