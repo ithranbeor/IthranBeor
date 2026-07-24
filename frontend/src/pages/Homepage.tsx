@@ -119,11 +119,11 @@ function HomePage() {
         {/* HEADER */}
         <header className="px-4 py-6 md:px-10 md:py-5 font-poppins relative z-1">
           <nav className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:flex-wrap">
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-1 min-w-0">
               <img
                 src={IthranLogo}
                 alt="Ithran Beor"
-                className="h-10 w-10 object-cover"
+                className="h-6 w-6 object-cover"
               />
               <h1 className="text-xl font-medium text-gray-800 truncate">
                 Ithran Beor
