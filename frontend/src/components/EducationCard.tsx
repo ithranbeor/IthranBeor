@@ -49,41 +49,12 @@ export default function EducationCard({
       className="flex w-full max-w-xs flex-col items-center"
     >
       {/* Level */}
-      <p className={`mb-4 text-sm font-semibold tracking-widest uppercase ${theme.accent}`}>
+      <p className={`mb-10 text-sm font-semibold tracking-widest uppercase ${theme.accent}`}>
         {entry.level}
       </p>
 
       {/* Photo */}
       <div className="relative w-full">
-        <motion.div
-          whileHover={{
-            y: -8,
-            scale: 1.02,
-          }}
-          transition={springy}
-          className={`
-            aspect-3/4
-            w-full
-            overflow-hidden
-            rounded-[2.5rem]
-            border
-            backdrop-blur-3xl
-            shadow-[0_20px_60px_rgba(15,23,42,0.18)]
-            ring-1
-            ring-white/40
-            ${theme.photo}
-          `}
-        >
-          <img
-            src={entry.photo}
-            alt={entry.school}
-            className="h-full w-full object-cover"
-          />
-
-          {/* Bottom gradient */}
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
-        </motion.div>
-
         {/* Floating Logo */}
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
           <div
