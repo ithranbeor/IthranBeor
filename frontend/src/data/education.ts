@@ -30,7 +30,7 @@ export const education: EducationEntry[] = [
     level: 'Senior High School',
     photo: CU,
     logo: CULogo,
-    degree: 'STEM (Nursing Aide)',
+    degree: 'Science, Technology, Engineering, and Mathematics (STEM) - Nursing Aide',
     school: 'Capitol University',
     dateRange: 'August 2020 – March 2022',
     theme: 'red',

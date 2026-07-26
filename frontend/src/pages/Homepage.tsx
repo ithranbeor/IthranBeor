@@ -209,7 +209,7 @@ function HomePage() {
               tracking-[-0.04em]
               lg:tracking-[-0.06em]
               text-white
-              drop-shadow-lg
+              drop-shadow-2xl
             ">
               Web Developer
               <br />
