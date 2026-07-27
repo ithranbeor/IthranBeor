@@ -35,11 +35,11 @@ export const projects: Project[] = [
     name: 'LearnIT',
     category: 'solo',
     logo: LearnITLogo, 
-    targetAudience: 'IT Enthusiasts, Students, Teachers',
+    targetAudience: 'IT Enthusiasts, IT students, and learners',
     version: '1.0.0',
-    coreStack: 'Django, Python, Figma, JavaScript, UI/UX',
+    coreStack: 'Django, Python, React, Vite',
     description:
-      'Lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum has been the industry\'s standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London.',
+      'LearnIT is a video library for IT students to share, collaborate, and learn from other users through videos and comments.',
     proofs: [
       { id: 'learnit-1', label: 'Pic 1', src: LearnITPic1 },
       { id: 'learnit-2', label: 'Pic 2', src: LearnITPic1 },
